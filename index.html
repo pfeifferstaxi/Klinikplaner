@@ -292,68 +292,68 @@
     <datalist id="waypoint-address-list"></datalist>
     <datalist id="global-address-list"></datalist>
 
-    <div class="flex-grow flex h-full overflow-hidden w-full no-print"> 
-        
-        <div id="left-panel" class="flex flex-col flex-grow h-full overflow-y-auto w-full md:w-1/2 border-r border-gray-300 relative no-print bg-[#f3f4f6]">
-            
-            <div class="bg-white border-b border-gray-300 flex-none z-20 shadow-sm no-print">
-                <div class="w-full mx-auto px-4 pt-4 pb-2"> 
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
-                        <div class="flex flex-col md:flex-row items-start md:items-center gap-3 w-full md:w-auto">
-                            <div class="flex items-center justify-between w-full md:w-auto gap-2">
-                                <h1 id="main-app-title" class="text-xl md:text-2xl font-extrabold text-gray-700 italic">Teufelsbad Planer</h1>
-                                <button onclick="openSettingsModal()" class="text-gray-400 hover:text-gray-800 transition text-xl outline-none" title="Einstellungen">⚙️</button>
-                            </div>
-                            <div class="flex flex-wrap gap-1">
-                                <button onclick="exportData()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase">Voll-Sichern</button>
-                                <button onclick="document.getElementById('importFile').value=''; document.getElementById('importFile').click()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase">Import</button>
-                                <button onclick="printCombinedDoc()" class="bg-gray-800 hover:bg-black text-white text-[10px] font-bold py-1 px-3 rounded uppercase">🖨 PDF Fahrpläne</button>
-                                <input type="file" id="importFile" class="hidden" accept=".json, application/json, text/plain, */*" onchange="importData(event)">
-                            </div>
-                        </div>
+    <div class="bg-white border-b border-gray-300 flex-none z-20 shadow-sm no-print w-full">
+        <div class="w-full mx-auto px-4 pt-4 pb-2"> 
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-3 w-full md:w-auto">
+                    <div class="flex items-center justify-between w-full md:w-auto gap-2">
+                        <h1 id="main-app-title" class="text-xl md:text-2xl font-extrabold text-gray-700 italic">Teufelsbad Planer</h1>
+                        <button onclick="openSettingsModal()" class="text-gray-400 hover:text-gray-800 transition text-xl outline-none" title="Einstellungen">⚙️</button>
                     </div>
-                </div>
-
-                <div id="global-metrics-bar" class="w-full px-4 pb-3 hidden">
-                    <div class="bg-gray-800 text-white rounded-xl p-3 flex flex-col md:flex-row justify-between items-center gap-3 shadow-lg border border-gray-700">
-                        <div class="flex flex-col text-blue-200 text-center md:text-left">
-                            <span class="text-[10px] uppercase font-bold tracking-wider">🛣 Gesamt KM (Alle Autos)</span>
-                            <span id="glob-val-gesamt" class="text-xl font-black text-white">0.0 km</span>
-                        </div>
-                        <div class="flex flex-col text-center">
-                            <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">💶 Gesamtkalkulation (Netto)</span>
-                            <div class="flex flex-wrap items-center justify-center gap-2 mt-0.5">
-                                <span id="glob-val-besetzt-euro" class="text-green-400 font-bold">0.00 €</span>
-                                <span class="text-gray-500 text-[10px]">(Besetzt)</span>
-                                <span class="text-gray-500 font-black hidden sm:inline">-</span>
-                                <span id="glob-val-leer-euro" class="text-red-400 font-bold">0.00 €</span>
-                                <span class="text-gray-500 text-[10px]">(Leer)</span>
-                                <span class="text-gray-500 font-black hidden sm:inline">=</span>
-                                <span id="glob-val-kalk" class="text-2xl font-black">0.00 €</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col text-center md:text-right text-red-300">
-                            <span class="text-[10px] uppercase font-bold tracking-wider">⚠️ Leer-KM Gesamt</span>
-                            <span id="glob-val-leer" class="text-xl font-black text-red-400">0.0 km</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="view-switch-container" style="justify-content: space-between; padding-left: 16px; padding-right: 16px; flex-wrap: wrap; gap: 12px; align-items: center; display: flex;">
-                    <div class="flex gap-2 items-center mx-auto md:mx-0 flex-wrap justify-center">
-                        <button onclick="showPatientMemory()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center">Patienten-Speicher</button>
-                        <button onclick="addNewTab()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center">Neues Auto</button>
-                        <button onclick="runAutoDispatcher()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center" title="Planung für Morgen">🪄 Auto-Disposition</button>
-                    </div>
-                    <div class="view-switch mx-auto md:mx-0">
-                        <button id="view-btn-planer" onclick="switchMainView('planer')" class="active">Planer</button>
-                        <button id="view-btn-karte" onclick="switchMainView('karte')">Karte</button>
+                    <div class="flex flex-wrap gap-1">
+                        <button onclick="exportData()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase">Voll-Sichern</button>
+                        <button onclick="document.getElementById('importFile').value=''; document.getElementById('importFile').click()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase">Import</button>
+                        <button onclick="printCombinedDoc()" class="bg-gray-800 hover:bg-black text-white text-[10px] font-bold py-1 px-3 rounded uppercase">🖨 PDF Fahrpläne</button>
+                        <input type="file" id="importFile" class="hidden" accept=".json, application/json, text/plain, */*" onchange="importData(event)">
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div id="global-metrics-bar" class="w-full px-4 pb-3 hidden">
+            <div class="bg-gray-800 text-white rounded-xl p-3 flex flex-col md:flex-row justify-between items-center gap-3 shadow-lg border border-gray-700">
+                <div class="flex flex-col text-blue-200 text-center md:text-left">
+                    <span class="text-[10px] uppercase font-bold tracking-wider">🛣 Gesamt KM (Alle Autos)</span>
+                    <span id="glob-val-gesamt" class="text-xl font-black text-white">0.0 km</span>
+                </div>
+                <div class="flex flex-col text-center">
+                    <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">💶 Gesamtkalkulation (Netto)</span>
+                    <div class="flex flex-wrap items-center justify-center gap-2 mt-0.5">
+                        <span id="glob-val-besetzt-euro" class="text-green-400 font-bold">0.00 €</span>
+                        <span class="text-gray-500 text-[10px]">(Besetzt)</span>
+                        <span class="text-gray-500 font-black hidden sm:inline">-</span>
+                        <span id="glob-val-leer-euro" class="text-red-400 font-bold">0.00 €</span>
+                        <span class="text-gray-500 text-[10px]">(Leer)</span>
+                        <span class="text-gray-500 font-black hidden sm:inline">=</span>
+                        <span id="glob-val-kalk" class="text-2xl font-black">0.00 €</span>
+                    </div>
+                </div>
+                <div class="flex flex-col text-center md:text-right text-red-300">
+                    <span class="text-[10px] uppercase font-bold tracking-wider">⚠️ Leer-KM Gesamt</span>
+                    <span id="glob-val-leer" class="text-xl font-black text-red-400">0.0 km</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="view-switch-container" style="justify-content: space-between; padding-left: 16px; padding-right: 16px; flex-wrap: wrap; gap: 12px; align-items: center; display: flex;">
+            <div class="flex gap-2 items-center mx-auto md:mx-0 flex-wrap justify-center">
+                <button onclick="showPatientMemory()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center">Patienten-Speicher</button>
+                <button onclick="showVehicleSelectionModal()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center" title="Fahrzeuge für heute wählen">🚐 Fahrzeuge</button>
+                <button onclick="addNewTab()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center">Neues Auto</button>
+                <button onclick="runAutoDispatcher()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-4 rounded shadow text-sm transition text-center" title="Planung für Morgen">🪄 Auto-Disposition</button>
+            </div>
+            <div class="view-switch mx-auto md:mx-0">
+                <button id="view-btn-planer" onclick="switchMainView('planer')" class="active">Planer</button>
+                <button id="view-btn-karte" onclick="switchMainView('karte')">Karte</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-grow flex h-full overflow-hidden w-full no-print"> 
+        
+        <div id="left-panel" class="flex flex-col flex-grow h-full overflow-y-auto w-full md:w-1/2 border-r border-gray-300 relative no-print bg-[#f3f4f6]">
             <div id="tabs-header" class="bg-gray-100 border-b border-gray-300 px-4 pt-2 flex space-x-1 overflow-x-auto flex-none w-full"></div>
             <div id="tabs-content" class="flex-grow w-full relative"></div>
-
         </div>
 
         <div id="map-container" class="hidden md:block w-full md:w-1/2 h-full relative border-l border-gray-300 no-print">
@@ -709,6 +709,7 @@
         <div class="bg-white rounded-xl w-full max-w-md mx-auto flex flex-col shadow-2xl">
             <div class="bg-blue-800 text-white p-4 rounded-t-xl flex justify-between items-center">
                 <h3 class="text-lg font-black uppercase italic">🚐 Fahrzeuge für heute wählen</h3>
+                <button onclick="document.getElementById('vehicleSelectionModal').classList.add('hidden')" class="text-white hover:text-blue-200 font-bold text-xl leading-none">×</button>
             </div>
             <div class="p-6 flex flex-col max-h-[70vh]">
                 <p class="text-xs text-gray-600 mb-4 border-b pb-4">
@@ -827,23 +828,18 @@
 
         const TOMTOM_API_KEY = "SiBGVPRYbkR0dbKAMIrdoZYd4BDGkP9c"; 
 
-        let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {
-            title: "Teufelsbad Planer",
-            defaultStartAddr: "Michaelstein 18, 38889 Blankenburg",
-            bufferMinutes: 10,
-            defaultTabName: "TP ..........",
-            preisBesetzt: 1.50,
-            preisLeer: 0.50,
-            typeLabels: {
-                klinik: "Klinik",
-                anreise: "Anreise",
-                abreise: "Abreise",
-                wegpunkt: "Wegpunkt"
-            },
-            vehicles: []
-        };
-
+        let appSettings = JSON.parse(localStorage.getItem('appSettings')) || {};
+        
         if (!appSettings.vehicles) appSettings.vehicles = [];
+        if (!appSettings.defaultTabName) appSettings.defaultTabName = "TP ..........";
+        if (!appSettings.typeLabels) {
+            appSettings.typeLabels = { klinik: "Klinik", anreise: "Anreise", abreise: "Abreise", wegpunkt: "Wegpunkt" };
+        }
+        if (!appSettings.title) appSettings.title = "Teufelsbad Planer";
+        if (!appSettings.defaultStartAddr) appSettings.defaultStartAddr = "Michaelstein 18, 38889 Blankenburg";
+        if (appSettings.bufferMinutes === undefined) appSettings.bufferMinutes = 10;
+        if (appSettings.preisBesetzt === undefined) appSettings.preisBesetzt = 1.50;
+        if (appSettings.preisLeer === undefined) appSettings.preisLeer = 0.50;
 
         if (appSettings.vehicles) {
             appSettings.vehicles.forEach(v => {
@@ -901,8 +897,8 @@
                 container.innerHTML += `
                 <div class="flex flex-col gap-2 bg-white p-3 border rounded shadow-sm" data-vindex="${idx}">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                        <input type="text" placeholder="Fahrzeug Name" value="${v.name}" class="veh-name w-full sm:w-1/3 p-1.5 border rounded text-xs outline-none focus:border-indigo-500">
-                        <input type="text" placeholder="Heimatadresse Fahrer" value="${v.address}" class="veh-addr w-full sm:w-1/3 p-1.5 border rounded text-xs outline-none focus:border-indigo-500">
+                        <input type="text" placeholder="Fahrzeug Name" value="${v.name || ''}" class="veh-name w-full sm:w-1/3 p-1.5 border rounded text-xs outline-none focus:border-indigo-500">
+                        <input type="text" placeholder="Heimatadresse Fahrer" value="${v.address || ''}" class="veh-addr w-full sm:w-1/3 p-1.5 border rounded text-xs outline-none focus:border-indigo-500">
                         <div class="flex flex-wrap items-center gap-2 mt-1 sm:mt-0">
                             ${checkOptions}
                             <label class="flex items-center gap-1 text-[10px] font-bold text-gray-600 whitespace-nowrap ml-0 sm:ml-2 border-l-0 sm:border-l pl-0 sm:pl-2 border-gray-200">
@@ -996,33 +992,39 @@
         function showVehicleSelectionModal() {
             const container = document.getElementById('vehicle-selection-list');
             container.innerHTML = '';
-            appSettings.vehicles.forEach((v, idx) => {
-                const isChecked = !v.inactive; 
-                let featText = `Sitze: ${v.maxPatients}`;
-                if(v.hasWheelchair) featText += ` | Rollstuhl: ${v.maxWheelchair || 1}`;
-                if(v.hasStretcher) featText += ` | Liege`;
+            if (!appSettings.vehicles || appSettings.vehicles.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-600 font-bold p-4 text-center border rounded bg-gray-50">Keine Fahrzeuge in den Einstellungen angelegt.</p>';
+            } else {
+                appSettings.vehicles.forEach((v, idx) => {
+                    const isChecked = !v.inactive; 
+                    let featText = `Sitze: ${v.maxPatients}`;
+                    if(v.hasWheelchair) featText += ` | Rollstuhl: ${v.maxWheelchair || 1}`;
+                    if(v.hasStretcher) featText += ` | Liege`;
 
-                container.innerHTML += `
-                    <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
-                        <input type="checkbox" id="veh-sel-${idx}" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${isChecked ? 'checked' : ''}>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-gray-800 text-sm">${v.name || 'Unbenanntes Fahrzeug'}</span>
-                            <span class="text-[10px] text-gray-500 uppercase">${featText}</span>
-                        </div>
-                    </label>
-                `;
-            });
+                    container.innerHTML += `
+                        <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                            <input type="checkbox" id="veh-sel-${idx}" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500" ${isChecked ? 'checked' : ''}>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-gray-800 text-sm">${v.name || 'Unbenanntes Fahrzeug'}</span>
+                                <span class="text-[10px] text-gray-500 uppercase">${featText}</span>
+                            </div>
+                        </label>
+                    `;
+                });
+            }
             document.getElementById('vehicleSelectionModal').classList.remove('hidden');
         }
 
         function saveVehicleSelection() {
-            appSettings.vehicles.forEach((v, idx) => {
-                const cb = document.getElementById(`veh-sel-${idx}`);
-                if (cb) {
-                    v.inactive = !cb.checked;
-                }
-            });
-            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            if (appSettings.vehicles) {
+                appSettings.vehicles.forEach((v, idx) => {
+                    const cb = document.getElementById(`veh-sel-${idx}`);
+                    if (cb) {
+                        v.inactive = !cb.checked;
+                    }
+                });
+                localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            }
             localStorage.setItem('vehicleSelectionDate_v3', getTodayISO());
             document.getElementById('vehicleSelectionModal').classList.add('hidden');
         }
@@ -1704,13 +1706,22 @@
         };
 
         function addNewTab(savedData = null) {
-            const id = savedData ? savedData.id : ++tabCounter;
-            if (!savedData && id > tabCounter) tabCounter = id;
+            let id;
+            if (savedData && savedData.id !== undefined && savedData.id !== null) {
+                id = savedData.id;
+            } else {
+                id = ++tabCounter;
+            }
+            if (id > tabCounter) tabCounter = id;
+
             const cont = document.createElement('div');
             cont.id = `tab-content-${id}`;
             cont.className = "tab-content hidden calculator-scroll-area w-full no-print";
             
-            const title = savedData ? savedData.title : appSettings.defaultTabName;
+            let title = appSettings.defaultTabName;
+            if (savedData && savedData.title && String(savedData.title).trim() !== "" && String(savedData.title).toUpperCase() !== "UNDEFINED" && String(savedData.title) !== "undefined") {
+                title = savedData.title;
+            }
             
             cont.innerHTML = `<div class="p-4 md:p-6 h-full flex flex-col"><h2 contenteditable="true" onblur="handleTitleChange(${id}, this)" class="tour-title text-xl md:text-2xl font-black italic text-gray-700 outline-none uppercase mb-4">${title}</h2><div class="flex flex-col sm:flex-row items-center gap-4 bg-[#f8fafc] border border-blue-100 p-3 rounded-xl mb-4 shadow-sm w-full"><div class="flex flex-col flex-1 w-full"><label class="text-[10px] font-bold uppercase text-blue-800 ml-1 mb-1">Tour-Datum</label><input type="date" class="tourDate p-2 border border-gray-200 rounded-md text-sm font-bold shadow-sm w-full outline-none focus:border-blue-500" onchange="saveAll()"></div><div class="flex flex-col flex-1 w-full"><label class="text-[10px] font-bold uppercase text-blue-800 ml-1 mb-1">Abfahrt Klinik</label><select class="startTime w-full p-2 border border-gray-200 rounded-md text-sm font-bold shadow-sm outline-none focus:border-blue-500" onchange="saveAll()"></select></div></div><div class="metrics-bar bg-white border border-gray-200 rounded-lg p-3 mb-4 flex flex-wrap justify-between items-center gap-3 text-xs font-black shadow-sm no-print hidden"><div class="flex flex-col text-blue-800"><span class="text-[9px] uppercase">🛣 Gesamt</span><span class="val-gesamt text-sm">0.0 km</span></div><div class="flex flex-col text-[9px] leading-tight text-center whitespace-nowrap"><span class="text-green-600"><span class="val-besetzt-euro">0.00 €</span> (Besetzt)</span><span class="text-red-600">- <span class="val-leer-euro">0.00 €</span> (Leer)</span><span class="border-t border-gray-300 mt-0.5 pt-0.5 val-kalk text-[11px]">= 0.00 €</span></div><div class="flex flex-col text-red-600 text-right" title="Strecke ohne Patient (Leerfahrt)"><span class="text-[9px] uppercase">⚠️ Leer-KM</span><span class="val-leer text-sm">0.0 km</span></div></div><div class="stopsContainer space-y-2"></div><div class="mt-6 flex flex-col gap-2 border-t pt-4 no-print"><div class="comparison-container flex flex-col gap-1 mb-2 bg-white p-2 border rounded-lg shadow-inner"></div><button class="addStopButton w-full py-3 bg-slate-300 text-slate-900 text-sm font-black border-2 border-slate-400 rounded hover:bg-slate-400 uppercase shadow-sm transition">+ Stopp hinzufügen</button><div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200 mt-2 gap-2"><span class="text-[10px] font-black uppercase text-gray-500 italic">Bevorzugter Modus:</span><div class="route-selector-container w-full sm:w-auto"><div class="route-opt ${(savedData && savedData.routeMode === 'fastest') ? 'active' : ''}" data-mode="fastest" onclick="setRouteMode(this)">Schnellste</div><div class="route-opt ${(savedData && savedData.routeMode === 'eco' || !savedData) ? 'active' : ''}" data-mode="eco" onclick="setRouteMode(this)">Sparsamste</div><div class="route-opt ${(savedData && savedData.routeMode === 'shortest') ? 'active' : ''}" data-mode="shortest" onclick="setRouteMode(this)">Kürzeste</div></div></div><button class="optimizeButton w-full py-4 bg-blue-600 text-white font-black rounded-lg shadow-xl hover:bg-blue-700 uppercase transition-all mt-2">📍 Route berechnen</button><button onclick="shareCurrentRoute()" class="w-full py-3 bg-green-600 text-white font-black rounded-lg shadow-xl hover:bg-green-700 uppercase transition-all mt-2">🔗 Route Teilen (Google Maps)</button><button onclick="clearFullPlaner()" class="w-full py-2 bg-red-200 text-red-800 text-[10px] font-bold rounded hover:bg-red-300 uppercase transition border border-red-400 mt-2 mb-8">🗑 Planer löschen</button></div></div>`;
             document.getElementById('tabs-content').appendChild(cont);
@@ -1751,16 +1762,27 @@
             activeTabId = id; document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-content-${id}`).classList.remove('hidden'); document.getElementById(`tab-btn-${id}`).classList.add('active');
             const inst = instanceData.find(i => i.id === id); if (inst) drawRouteOnMap(inst.legsData, inst.tourStops);
-            // Scroll to the active tab button so it's in view
             document.getElementById(`tab-btn-${id}`).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
 
         function removeTab(id) {
-            if (instanceData.length === 1) return alert("Ein Auto muss bleiben!");
+            if (instanceData.length === 1) {
+                alert("Ein Auto muss bleiben!");
+                return;
+            }
             if (!confirm("Auto löschen?")) return;
+            
             instanceData = instanceData.filter(i => i.id !== id);
-            document.getElementById(`tab-content-${id}`).remove(); document.getElementById(`tab-btn-${id}`).remove();
-            if (activeTabId === id) switchTab(instanceData[0].id);
+            
+            const tabContent = document.getElementById(`tab-content-${id}`);
+            const tabBtn = document.getElementById(`tab-btn-${id}`);
+            
+            if (tabContent) tabContent.remove();
+            if (tabBtn) tabBtn.remove();
+            
+            if (activeTabId === id && instanceData.length > 0) {
+                switchTab(instanceData[0].id);
+            }
             saveAll();
         }
 
@@ -2094,26 +2116,25 @@
             };
             const fileName = `Planer_Backup_${getTodayISO()}.json`;
             const jsonStr = JSON.stringify(data, null, 2);
-
+            
+            // Für mobile Geräte: Native Teilen-Funktion (übergibt die Datei direkt an die Dropbox-App)
             try {
-                if (window.showSaveFilePicker) {
-                    const fileHandle = await window.showSaveFilePicker({
-                        suggestedName: fileName,
-                        types: [{
-                            description: 'JSON Backup Datei',
-                            accept: {'application/json': ['.json']},
-                        }],
+                const file = new File([jsonStr], fileName, { type: 'application/json' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Planer Backup',
+                        text: 'Backup Datei für den Klinik-Tourenplaner'
                     });
-                    const writable = await fileHandle.createWritable();
-                    await writable.write(jsonStr);
-                    await writable.close();
-                    return; 
+                    return; // Erfolgreich über Share-Dialog (z.B. direkt in Dropbox) gespeichert
                 }
             } catch (err) {
-                if (err.name === 'AbortError') return;
-                console.warn("FilePicker nicht verfügbar oder abgebrochen, nutze nativen Fallback...");
+                if (err.name === 'AbortError') return; // User hat den Dialog abgebrochen
+                console.warn("Share API nicht verfügbar oder fehlgeschlagen, nutze Fallback...");
             }
 
+            // Fallback für Laptops/PCs: Standard Download
+            // (Verhindert das "showSaveFilePicker" Problem, bei dem Dropbox die temporären Dateien blockiert)
             try {
                 const blob = new Blob([jsonStr], { type: 'application/json' });
                 if (window.navigator && window.navigator.msSaveOrOpenBlob) {
@@ -2925,18 +2946,10 @@
             document.getElementById('dispatcher-status').innerText = "Fahrzeug-Heimatadressen werden ermittelt...";
             let availableVehicles = appSettings.vehicles.filter(v => !v.inactive);
             
-            // Priorisierung von "Läuferautos" (Fahrzeuge ohne Rollstuhl und ohne Liege)
-            availableVehicles.sort((a, b) => {
-                const aIsLaufer = (!a.hasWheelchair && !a.hasStretcher);
-                const bIsLaufer = (!b.hasWheelchair && !b.hasStretcher);
-                if (aIsLaufer && !bIsLaufer) return -1;
-                if (!aIsLaufer && bIsLaufer) return 1;
-                return 0;
-            });
-
             for (let v of availableVehicles) {
                 v.lat = clinicLat;
                 v.lon = clinicLon;
+                v.used = false;
                 if (v.address && v.address !== appSettings.defaultStartAddr) {
                     try {
                         const resV = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(v.address)}.json?key=${TOMTOM_API_KEY}&limit=1&countrySet=DE`);
@@ -2949,7 +2962,7 @@
                 }
             }
 
-            document.getElementById('dispatcher-status').innerText = "Berechne optimale Routen & verteile Patienten...";
+            document.getElementById('dispatcher-status').innerText = "Berechne Ketten-Routen & verteile Patienten...";
 
             const dist = (l1, ln1, l2, ln2) => {
                 if (!l1 || !ln1 || !l2 || !ln2) return 9999;
@@ -2958,35 +2971,85 @@
             
             let autoCount = 0;
 
+            let outposts = availableVehicles.filter(v => dist(v.lat, v.lon, clinicLat, clinicLon) > 10);
+            
+            for (let i = 0; i < outposts.length; i++) {
+                let v = outposts[i];
+                if (anreisen.length === 0) break;
+                
+                let sortedAnr = [...anreisen].sort((a,b) => dist(a.lat, a.lon, v.lat, v.lon) - dist(b.lat, b.lon, v.lat, v.lon));
+                let closestAnr = sortedAnr[0];
+                
+                if (dist(closestAnr.lat, closestAnr.lon, v.lat, v.lon) < dist(closestAnr.lat, closestAnr.lon, clinicLat, clinicLon) + 20) {
+                    v.used = true;
+                    buildTourForVehicle(v, "pure_anreise", closestAnr);
+                }
+            }
+            
+            let remainingVehicles = availableVehicles.filter(v => !v.used);
+            remainingVehicles.sort((a,b) => dist(a.lat, a.lon, clinicLat, clinicLon) - dist(b.lat, b.lon, clinicLat, clinicLon));
+
             while (einweisungen.length > 0 || abreisen.length > 0 || anreisen.length > 0) {
-                let vehicle = availableVehicles.shift();
-                let isExtra = false;
+                let vehicle = remainingVehicles.shift();
                 if (!vehicle) {
-                    let nextP = einweisungen[0] || abreisen[0] || anreisen[0];
                     let neededL = false;
                     let neededW = false;
-                    if (nextP.features && nextP.features.includes('L')) neededL = true;
-                    if (nextP.features && nextP.features.includes('R')) neededW = true;
+                    let nextP = einweisungen[0] || abreisen[0] || anreisen[0];
+                    if (nextP && nextP.features && nextP.features.includes('L')) neededL = true;
+                    if (nextP && nextP.features && nextP.features.includes('R')) neededW = true;
                     vehicle = { name: "Zusatz-Auto", address: appSettings.defaultStartAddr, hasWheelchair: neededW, hasStretcher: neededL, maxPatients: 5, maxWheelchair: neededW ? 2 : 0, lat: clinicLat, lon: clinicLon };
-                    isExtra = true;
                 }
 
-                let vState = { 
-                    hasWheelchair: vehicle.hasWheelchair || false, 
-                    hasStretcher: vehicle.hasStretcher || false, 
-                    maxP: vehicle.maxPatients !== undefined ? vehicle.maxPatients : 5, 
-                    maxW: vehicle.hasWheelchair ? (vehicle.maxWheelchair || 1) : 0, 
-                    pCount: 0, wCount: 0, lCount: 0 
-                };
+                let tourType = "";
+                let seedPatient = null;
+                
+                if (einweisungen.length > 0) {
+                    tourType = "einweisung";
+                    let validEinw = einweisungen.filter(p => canTake(vehicle, p, {pCount:0, wCount:0, lCount:0}));
+                    if(validEinw.length > 0) {
+                        validEinw.sort((a,b) => dist(a.lat, a.lon, vehicle.lat, vehicle.lon) - dist(b.lat, b.lon, vehicle.lat, vehicle.lon));
+                        seedPatient = validEinw[0];
+                    } else {
+                        seedPatient = einweisungen[0]; 
+                    }
+                } else if (abreisen.length > 0) {
+                    tourType = "kombi"; 
+                    let validAbr = abreisen.filter(p => canTake(vehicle, p, {pCount:0, wCount:0, lCount:0}));
+                    if(validAbr.length > 0) {
+                        validAbr.sort((a,b) => dist(a.lat, a.lon, clinicLat, clinicLon) - dist(b.lat, b.lon, clinicLat, clinicLon));
+                        seedPatient = validAbr[0];
+                    } else {
+                        seedPatient = abreisen[0];
+                    }
+                } else if (anreisen.length > 0) {
+                    tourType = "pure_anreise";
+                    let validAnr = anreisen.filter(p => canTake(vehicle, p, {pCount:0, wCount:0, lCount:0}));
+                    if(validAnr.length > 0) {
+                        validAnr.sort((a,b) => dist(a.lat, a.lon, vehicle.lat, vehicle.lon) - dist(b.lat, b.lon, vehicle.lat, vehicle.lon));
+                        seedPatient = validAnr[0];
+                    } else {
+                        seedPatient = anreisen[0];
+                    }
+                }
 
-                const canTake = (p) => {
-                    let isL = p.features && p.features.includes('L');
-                    let isR = p.features && p.features.includes('R');
-                    if (isL) { return vState.hasStretcher && vState.lCount < 1; }
-                    if (isR) { return vState.hasWheelchair && vState.wCount < vState.maxW; }
-                    return vState.pCount < vState.maxP;
-                };
+                buildTourForVehicle(vehicle, tourType, seedPatient);
+            }
 
+            function canTake(vehicle, p, vState) {
+                let maxP = vehicle.maxPatients !== undefined ? vehicle.maxPatients : 5;
+                let maxW = vehicle.hasWheelchair ? (vehicle.maxWheelchair || 1) : 0;
+                let hasS = vehicle.hasStretcher || false;
+                
+                let isL = p.features && p.features.includes('L');
+                let isR = p.features && p.features.includes('R');
+                
+                if (isL) { return hasS && vState.lCount < 1; }
+                if (isR) { return vehicle.hasWheelchair && vState.wCount < maxW; }
+                return vState.pCount < maxP;
+            }
+
+            function buildTourForVehicle(vehicle, tourType, seedPatient) {
+                let vState = { pCount: 0, wCount: 0, lCount: 0 };
                 const addCount = (p) => {
                     let isL = p.features && p.features.includes('L');
                     let isR = p.features && p.features.includes('R');
@@ -2999,123 +3062,129 @@
                 let selectedAbreisen = [];
                 let selectedAnreisen = [];
 
-                let validEinw = einweisungen.filter(canTake);
-                if (validEinw.length > 0) {
-                    validEinw.sort((a,b) => dist(a.lat, a.lon, vehicle.lat, vehicle.lon) - dist(b.lat, b.lon, vehicle.lat, vehicle.lon));
-                    selectedEinw = validEinw[0];
-                    einweisungen = einweisungen.filter(p => p.id !== selectedEinw.id);
-                    addCount(selectedEinw);
-                } else {
-                    let validAbr = abreisen.filter(canTake);
-                    if (validAbr.length > 0) {
-                        validAbr.sort((a,b) => dist(a.lat, a.lon, clinicLat, clinicLon) - dist(b.lat, b.lon, clinicLat, clinicLon));
-                        let seed = validAbr[0];
-                        selectedAbreisen.push(seed);
-                        addCount(seed);
-                        abreisen = abreisen.filter(p => p.id !== seed.id);
-
-                        while(true) {
-                            let cAbr = abreisen.filter(canTake);
-                            if (cAbr.length === 0) break;
-                            let last = selectedAbreisen[selectedAbreisen.length-1];
-                            cAbr.sort((a,b) => dist(a.lat, a.lon, last.lat, last.lon) - dist(b.lat, b.lon, last.lat, last.lon));
-                            let nextP = cAbr[0];
-                            selectedAbreisen.push(nextP);
-                            addCount(nextP);
-                            abreisen = abreisen.filter(p => p.id !== nextP.id);
-                        }
+                if (tourType === "einweisung") {
+                    selectedEinw = seedPatient;
+                    einweisungen = einweisungen.filter(p => p.id !== seedPatient.id);
+                    addCount(seedPatient);
+                } else if (tourType === "kombi") {
+                    selectedAbreisen.push(seedPatient);
+                    abreisen = abreisen.filter(p => p.id !== seedPatient.id);
+                    addCount(seedPatient);
+                    
+                    while(true) {
+                        let cAbr = abreisen.filter(p => canTake(vehicle, p, vState));
+                        if (cAbr.length === 0) break;
+                        let last = selectedAbreisen[selectedAbreisen.length-1];
+                        cAbr.sort((a,b) => dist(a.lat, a.lon, last.lat, last.lon) - dist(b.lat, b.lon, last.lat, last.lon));
+                        let nextP = cAbr[0];
+                        selectedAbreisen.push(nextP);
+                        addCount(nextP);
+                        abreisen = abreisen.filter(p => p.id !== nextP.id);
                     }
-
-                    let validAnr = anreisen.filter(canTake);
-                    if (validAnr.length > 0) {
-                        if (selectedAbreisen.length > 0) {
-                            let lastAbr = selectedAbreisen[selectedAbreisen.length-1];
-                            validAnr.sort((a,b) => dist(a.lat, a.lon, lastAbr.lat, lastAbr.lon) - dist(b.lat, b.lon, lastAbr.lat, lastAbr.lon));
-                        } else {
-                            validAnr.sort((a,b) => dist(a.lat, a.lon, vehicle.lat, vehicle.lon) - dist(b.lat, b.lon, vehicle.lat, vehicle.lon));
-                        }
-                        
-                        let seed = validAnr[0];
-                        selectedAnreisen.push(seed);
-                        addCount(seed);
-                        anreisen = anreisen.filter(p => p.id !== seed.id);
-
-                        while(true) {
-                            let cAnr = anreisen.filter(canTake);
-                            if (cAnr.length === 0) break;
-                            let last = selectedAnreisen[selectedAnreisen.length-1];
-                            cAnr.sort((a,b) => dist(a.lat, a.lon, last.lat, last.lon) - dist(b.lat, b.lon, last.lat, last.lon));
-                            let nextP = cAnr[0];
-                            selectedAnreisen.push(nextP);
-                            addCount(nextP);
-                            anreisen = anreisen.filter(p => p.id !== nextP.id);
-                        }
+                    
+                    let lastDropoff = selectedAbreisen[selectedAbreisen.length-1];
+                    let currentLat = lastDropoff.lat;
+                    let currentLon = lastDropoff.lon;
+                    
+                    while(true) {
+                        let cAnr = anreisen.filter(p => canTake(vehicle, p, vState));
+                        if (cAnr.length === 0) break;
+                        cAnr.sort((a,b) => dist(a.lat, a.lon, currentLat, currentLon) - dist(b.lat, b.lon, currentLat, currentLon));
+                        let bestAnr = cAnr[0];
+                        selectedAnreisen.push(bestAnr);
+                        addCount(bestAnr);
+                        anreisen = anreisen.filter(p => p.id !== bestAnr.id);
+                        currentLat = bestAnr.lat;
+                        currentLon = bestAnr.lon;
+                    }
+                } else if (tourType === "pure_anreise") {
+                    selectedAnreisen.push(seedPatient);
+                    anreisen = anreisen.filter(p => p.id !== seedPatient.id);
+                    addCount(seedPatient);
+                    
+                    while(true) {
+                        let cAnr = anreisen.filter(p => canTake(vehicle, p, vState));
+                        if (cAnr.length === 0) break;
+                        let last = selectedAnreisen[selectedAnreisen.length-1];
+                        cAnr.sort((a,b) => dist(a.lat, a.lon, last.lat, last.lon) - dist(b.lat, b.lon, last.lat, last.lon));
+                        let nextP = cAnr[0];
+                        selectedAnreisen.push(nextP);
+                        addCount(nextP);
+                        anreisen = anreisen.filter(p => p.id !== nextP.id);
                     }
                 }
 
-                let currentAutoId = ++tabCounter;
-                let isPureAnreise = !selectedEinw && selectedAbreisen.length === 0 && selectedAnreisen.length > 0;
-                
                 let estDistance = 0;
                 let lastLat = null; let lastLon = null;
-                
-                if (isPureAnreise && vehicle.address && vehicle.address !== appSettings.defaultStartAddr) {
-                    lastLat = vehicle.lat; lastLon = vehicle.lon;
+                let startAddress = "";
+                let startName = "";
+                let startType = "";
+                let startLat = null;
+                let startLon = null;
+
+                if (tourType === "pure_anreise" && vehicle.address && vehicle.address.trim().length > 3 && vehicle.address !== appSettings.defaultStartAddr) {
+                    startAddress = vehicle.address;
+                    startName = vehicle.name ? vehicle.name + " (Start)" : "Heimatadresse";
+                    startType = "wegpunkt";
+                    startLat = vehicle.lat;
+                    startLon = vehicle.lon;
                 } else {
-                    lastLat = clinicLat; lastLon = clinicLon;
+                    startAddress = appSettings.defaultStartAddr;
+                    startName = appSettings.typeLabels.klinik;
+                    startType = "klinik";
+                    startLat = clinicLat;
+                    startLon = clinicLon;
                 }
 
-                const addDist = (lat, lon) => {
-                    estDistance += dist(lastLat, lastLon, lat, lon);
-                    lastLat = lat; lastLon = lon;
-                }
+                lastLat = startLat; lastLon = startLon;
+                const addDist = (lat, lon) => { estDistance += dist(lastLat, lastLon, lat, lon); lastLat = lat; lastLon = lon; }
 
                 let akutLat = null; let akutLon = null;
-                if (selectedEinw) {
+                if (tourType === "einweisung") {
                     addDist(selectedEinw.lat, selectedEinw.lon);
                     akutLat = selectedEinw.lat; akutLon = selectedEinw.lon;
-                    if (selectedEinw.addressAlt) {
-                        try {
-                            const resAkut = await fetch(`https://api.tomtom.com/search/2/geocode/${encodeURIComponent(selectedEinw.addressAlt)}.json?key=${TOMTOM_API_KEY}&limit=1&countrySet=DE`);
-                            const dataAkut = await resAkut.json();
-                            if (dataAkut.results && dataAkut.results[0]) {
-                                akutLat = dataAkut.results[0].position.lat;
-                                akutLon = dataAkut.results[0].position.lon;
-                            }
-                        } catch(e) {}
-                        addDist(akutLat, akutLon);
-                    }
-                } else {
+                    if (selectedEinw.addressAlt) addDist(akutLat, akutLon); 
+                } else if (tourType === "kombi") {
                     selectedAbreisen.forEach(p => addDist(p.lat, p.lon));
                     selectedAnreisen.forEach(p => addDist(p.lat, p.lon));
-                    if (selectedAnreisen.length > 0) addDist(clinicLat, clinicLon); 
+                    if (selectedAnreisen.length > 0) {
+                        addDist(clinicLat, clinicLon);
+                    } else {
+                        addDist(clinicLat, clinicLon); 
+                    }
+                } else if (tourType === "pure_anreise") {
+                    selectedAnreisen.forEach(p => addDist(p.lat, p.lon));
+                    addDist(clinicLat, clinicLon);
                 }
 
                 let stopCount = (selectedEinw ? 2 : 0) + selectedAbreisen.length + selectedAnreisen.length;
                 let drivingMins = (estDistance * 1.3 / 60) * 60; 
                 let totalMins = drivingMins + (stopCount * appSettings.bufferMinutes);
+
+                let calculatedStartT = "08:15";
                 
-                let startMins = 795 - totalMins;
-                if (startMins < 300) startMins = 300; 
-                startMins = Math.floor(startMins / 15) * 15; 
-                
-                let sH = Math.floor(startMins / 60);
-                let sM = startMins % 60;
-                let calculatedStartT = String(sH).padStart(2, '0') + ':' + String(sM).padStart(2, '0');
+                if (tourType === "pure_anreise") {
+                    let targetEndMins = 795; 
+                    let startMins = targetEndMins - totalMins;
+                    startMins = Math.floor(startMins / 5) * 5; 
+                    if (startMins < 0) startMins = 0;
+                    let sH = Math.floor(startMins / 60);
+                    let sM = startMins % 60;
+                    calculatedStartT = String(sH).padStart(2, '0') + ':' + String(sM).padStart(2, '0');
+                } else {
+                    calculatedStartT = "08:15";
+                }
 
                 let tabName = appSettings.defaultTabName;
-                if (vehicle.name && vehicle.name !== "Zusatz-Auto") tabName = vehicle.name;
+                if (vehicle.name && vehicle.name.trim() !== "" && vehicle.name !== "Zusatz-Auto") tabName = vehicle.name;
 
+                let currentAutoId = ++tabCounter;
                 addNewTab({ id: currentAutoId, title: tabName, tourStops: [], legsData: [], tourDate: tomorrow, startT: calculatedStartT, routeMode: "eco" });
                 const inst = instanceData.find(i => i.id === currentAutoId);
 
-                if (isPureAnreise && vehicle.address && vehicle.address !== appSettings.defaultStartAddr) {
-                    inst.addManualStop(vehicle.address, vehicle.name + " (Start)", 'wegpunkt', vehicle.lat, vehicle.lon);
-                } else {
-                    inst.addManualStop(appSettings.defaultStartAddr, appSettings.typeLabels.klinik, 'klinik', clinicLat, clinicLon);
-                }
+                inst.addManualStop(startAddress, startName, startType, startLat, startLon);
 
-                if (selectedEinw) {
+                if (tourType === "einweisung") {
                     let fStr = selectedEinw.features && selectedEinw.features.length ? ` [${selectedEinw.features.join(',')}]` : "";
                     let idx = fullMemory.findIndex(m => m.id === selectedEinw.id);
                     if (idx > -1) fullMemory[idx].isLoaded = true;
@@ -3123,7 +3192,7 @@
                     if (selectedEinw.addressAlt) {
                         inst.addManualStop(selectedEinw.addressAlt, selectedEinw.name + fStr + " (Ziel Akutklinik)", 'wegpunkt', akutLat, akutLon);
                     }
-                } else {
+                } else if (tourType === "kombi") {
                     selectedAbreisen.forEach(p => {
                         let fStr = p.features && p.features.length ? ` [${p.features.join(',')}]` : "";
                         let idx = fullMemory.findIndex(m => m.id === p.id);
@@ -3139,7 +3208,17 @@
                     
                     if (selectedAnreisen.length > 0) {
                         inst.addManualStop(appSettings.defaultStartAddr, appSettings.typeLabels.klinik, 'klinik', clinicLat, clinicLon);
+                    } else {
+                        inst.addManualStop("38889 Blankenburg", "Blankenburg", 'wegpunkt', 51.797, 10.957);
                     }
+                } else if (tourType === "pure_anreise") {
+                    selectedAnreisen.forEach(p => {
+                        let fStr = p.features && p.features.length ? ` [${p.features.join(',')}]` : "";
+                        let idx = fullMemory.findIndex(m => m.id === p.id);
+                        if (idx > -1) fullMemory[idx].isLoaded = true;
+                        inst.addStopFromMemory(p.addressAlt || p.address, p.name + fStr, 'anreise', p.id);
+                    });
+                    inst.addManualStop(appSettings.defaultStartAddr, appSettings.typeLabels.klinik, 'klinik', clinicLat, clinicLon);
                 }
                 autoCount++;
             }
@@ -3148,7 +3227,7 @@
             saveAll(); 
             
             document.getElementById('dispatcher-loading-modal').classList.add('hidden');
-            alert("Fertig! Es wurden " + autoCount + " Autos für morgen generiert.\nSpäteste Ziel-Ankunftszeit ist auf ~13:15 Uhr vorkalkuliert.\nBitte bei jedem Auto auf 'Route berechnen' klicken!");
+            alert("Fertig! Es wurden " + autoCount + " Autos für morgen generiert.\nAbreisen werden nun mit Anreisen für den Rückweg kombiniert.\nBitte bei jedem Auto auf 'Route berechnen' klicken!");
             
             if(autoCount > 0) {
                 switchTab(instanceData[instanceData.length - autoCount].id);
