@@ -287,7 +287,7 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="flex flex-col min-h-screen bg-[#f3f4f6]">
 
     <datalist id="waypoint-address-list"></datalist>
     <datalist id="global-address-list"></datalist>
@@ -349,14 +349,14 @@
         </div>
     </div>
 
-    <div class="flex-grow flex h-full overflow-hidden w-full no-print"> 
+    <div class="flex-grow flex w-full no-print"> 
         
-        <div id="left-panel" class="flex flex-col flex-grow h-full overflow-y-auto w-full md:w-1/2 border-r border-gray-300 relative no-print bg-[#f3f4f6]">
+        <div id="left-panel" class="flex flex-col flex-grow w-full md:w-1/2 border-r border-gray-300 relative no-print bg-[#f3f4f6]">
             <div id="tabs-header" class="bg-gray-100 border-b border-gray-300 px-4 pt-2 flex space-x-1 overflow-x-auto flex-none w-full"></div>
             <div id="tabs-content" class="flex-grow w-full relative"></div>
         </div>
 
-        <div id="map-container" class="hidden md:block w-full md:w-1/2 h-full relative border-l border-gray-300 no-print">
+        <div id="map-container" class="hidden md:block w-full md:w-1/2 sticky top-0 h-[100vh] border-l border-gray-300 no-print z-10">
             <div id="map-display"></div>
         </div>
 
