@@ -300,10 +300,16 @@
                         <h1 id="main-app-title" class="text-xl md:text-2xl font-extrabold text-gray-700 italic">Teufelsbad Planer</h1>
                         <button onclick="openSettingsModal()" class="text-gray-400 hover:text-gray-800 transition text-xl outline-none" title="Einstellungen">⚙️</button>
                     </div>
-                    <div class="flex flex-wrap gap-1">
-                        <button onclick="exportData()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase">Voll-Sichern</button>
-                        <button onclick="document.getElementById('importFile').value=''; document.getElementById('importFile').click()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase">Import</button>
-                        <button onclick="printCombinedDoc()" class="bg-gray-800 hover:bg-black text-white text-[10px] font-bold py-1 px-3 rounded uppercase">🖨 PDF Fahrpläne</button>
+                    <div class="flex flex-wrap gap-1 items-center">
+                        <button id="btn-dropbox-upload" onclick="uploadToDropbox()" class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-[10px] font-bold py-1 px-2 rounded uppercase shadow border border-blue-300 flex items-center gap-1">☁️ In Cloud sichern</button>
+                        <button id="btn-dropbox-download" onclick="downloadFromDropbox()" class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-[10px] font-bold py-1 px-2 rounded uppercase shadow border border-blue-300 flex items-center gap-1">☁️ Aus Cloud laden</button>
+                        
+                        <span class="text-gray-300 mx-1">|</span>
+                        
+                        <button onclick="exportData()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase border border-gray-300">Voll-Sichern</button>
+                        <button onclick="document.getElementById('importFile').value=''; document.getElementById('importFile').click()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase border border-gray-300">Import</button>
+                        
+                        <button onclick="printCombinedDoc()" class="bg-gray-800 hover:bg-black text-white text-[10px] font-bold py-1 px-3 rounded uppercase ml-1">🖨 PDF Fahrpläne</button>
                         <input type="file" id="importFile" class="hidden" accept=".json, application/json, text/plain, */*" onchange="importData(event)">
                     </div>
                 </div>
@@ -2042,6 +2048,9 @@
                     comparisonData = results;
                     const activeMode = root.querySelector('.route-opt.active')?.dataset.mode || 'eco';
                     applyModeData(activeMode);
+                    
+                    // Automatisches, stilles Backup auslösen
+                    uploadToDropbox(true);
                 } catch (e) { console.error(e); alert("Fehler bei der Berechnung."); } finally { optBtn.innerText = "📍 Route berechnen"; optBtn.disabled = false; }
             }
 
@@ -2117,7 +2126,6 @@
             const fileName = `Planer_Backup_${getTodayISO()}.json`;
             const jsonStr = JSON.stringify(data, null, 2);
             
-            // Für mobile Geräte: Native Teilen-Funktion (übergibt die Datei direkt an die Dropbox-App)
             try {
                 const file = new File([jsonStr], fileName, { type: 'application/json' });
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -2126,15 +2134,13 @@
                         title: 'Planer Backup',
                         text: 'Backup Datei für den Klinik-Tourenplaner'
                     });
-                    return; // Erfolgreich über Share-Dialog (z.B. direkt in Dropbox) gespeichert
+                    return; 
                 }
             } catch (err) {
-                if (err.name === 'AbortError') return; // User hat den Dialog abgebrochen
+                if (err.name === 'AbortError') return; 
                 console.warn("Share API nicht verfügbar oder fehlgeschlagen, nutze Fallback...");
             }
 
-            // Fallback für Laptops/PCs: Standard Download
-            // (Verhindert das "showSaveFilePicker" Problem, bei dem Dropbox die temporären Dateien blockiert)
             try {
                 const blob = new Blob([jsonStr], { type: 'application/json' });
                 if (window.navigator && window.navigator.msSaveOrOpenBlob) {
@@ -2180,10 +2186,117 @@
             };
             
             reader.onerror = () => {
-                alert("Fehler: Dein Gerät oder Cloud-Speicher (Dropbox) hat den Zugriff auf die Datei verweigert.");
+                alert("Fehler: Dein Gerät oder Cloud-Speicher hat den Zugriff auf die Datei verweigert.");
             };
             
             reader.readAsText(file);
+        }
+
+        const DEFAULT_DROPBOX_TOKEN = "sl.u.AGj2b8O4SCsIV-SZY64Ax0T17k-RFi7HL34Xo_6gTxtFgUsTigoGZvU-gguxnpFiH0yBFwKKL9_rdh17gfWOfurzsSpwXAC34GAcBSbHijziBllJI87FHK78ogomZ-4heF482CdxYIM9nEcfq-pTXTGBGCgjOeHGjilm7byJqYXqAoDX9BxPgLkqcRZE7GFG0I9dXqTLEu7UW2Dr-EyfS5BEb7-mib2FrIlF-EgQCRkq5h1vXnSe4syUlw1Iaug2ZobBWiVNp6K7DkXIXQZx2cK9J-gqdDhFmh-3IgX_eUAD-SjBcgjt1QXeJ6Rd0fElFB9_7mneOXb45U7EDadO5llbyG5cHmMcU2cuA02onNcktfUqWpXTTR3PgA7mI6eStNqJAtuTn8bfHYnHq25gicTWS2h0Hy-5Uw478t9hlakfrZY1fFsySz_dJz0TZMjyci5-eRYmL_T2md--oGABFxf6yLGKRPdAK3d3vEwP1GNr8EPFji5HyXFXG3KX0AyKOlx1rik_5FiU3vZ6qyXR1K0vMM1ARU_rm6XDr4tKpx9Tf3g2uC2z3L47i9HIJtRXvJEQTWNKaeF-LgsJpSKUt0cvd-rHTfztgN6tkzjdIPv26hU_g41F3Gsb9c-3DNoqJXq1DeW6ODq6jmjXiL7cLLdAszF0Imowj00YL-Mg9YxpM_tCWtIYOzLIgd0u-MWEBkAVl33Evj_X7YYqF7lLUn2YqU7dc5U3oe6x4opBJyiNSyBBKFoz_kzOy_-jmcRdL-RYPk1KymzKP3R-X5Rs-oAidN5Tas9ynJQ9jgPPteArW25Skw42DPKdLlMRLzLlthYBtnrZ7ramxpU9zHlwu1UZZaFhi1MjDnsWWyJ9MLfWNZbYor1sNQ6XRvSMDDoZOz_CL92JBiREUEZdcr3rS68CtW1LndYyRetpvsRK4z8R63pNW5dl9Qio9kdBxtEOIKYzv2gp-oC20-Jgf2TAyFbnRSGe1zShxCE1qqs3r-gZVNcFN5_PQ7cW5aF4V8XrZcsRcAR3y_sEIx2EYaAXVjcdRsI2C6RGP_fNtrG6CvTa7f0-y1q0v9mgicreDBR2se6t2wD5gK-y6bCqIUQG9ytbFiBiBOLPtznkPkvPmROljQsBMS05dLy0flh_-maU-8nkiEBUwVc0gLGUUYkdu4ZaWXj_Mgk9xcn9Q6ojQJPpyKjhlI1GPKZWZr5-K9kXi1duAgEgGIy7RTDpNCGQfgJmZ1TD4bNvSuLNfJ4IWTgzEGVZvZHq4tg38bYlilYbMQfpyoDZNy4Fc3kxXCUJ2IjTqpgklX4pGw4i2Jkfd8q0YA";
+
+        async function uploadToDropbox(silent = false) {
+            const token = localStorage.getItem('dropbox_token') || DEFAULT_DROPBOX_TOKEN;
+            const data = {
+                settings: JSON.parse(localStorage.getItem('appSettings') || '{}'),
+                memory: JSON.parse(localStorage.getItem('patientMemory') || '[]'),
+                tours: JSON.parse(localStorage.getItem('activeToursData') || '{}'),
+                abholadressen: JSON.parse(localStorage.getItem('savedAbholadressen') || '[]'),
+                globalHistory: JSON.parse(localStorage.getItem('globalAddressHistory') || '[]'),
+                waypointHistory: JSON.parse(localStorage.getItem('waypointAddressHistory') || '[]')
+            };
+            const jsonStr = JSON.stringify(data, null, 2);
+            
+            const btn = document.getElementById('btn-dropbox-upload');
+            let oldHtml = "";
+            if (btn && !silent) { 
+                oldHtml = btn.innerHTML;
+                btn.innerHTML = "⏳ Lädt..."; 
+                btn.disabled = true; 
+            }
+
+            try {
+                const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Dropbox-API-Arg': JSON.stringify({
+                            path: '/backup.json',
+                            mode: 'overwrite',
+                            autorename: false,
+                            mute: false,
+                            strict_conflict: false
+                        }),
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    body: jsonStr
+                });
+
+                if (response.ok) {
+                    if (!silent) alert("✅ Erfolgreich in der Dropbox gesichert!");
+                } else if (response.status === 401) {
+                    if (!silent) handleTokenError();
+                } else {
+                    const err = await response.json();
+                    if (!silent) alert("Fehler beim Upload: " + (err.error_summary || response.statusText));
+                    else console.error("Silent Backup Error:", err);
+                }
+            } catch (e) {
+                if (!silent) alert("Netzwerkfehler: " + e.message);
+                else console.error("Silent Backup Network Error:", e);
+            } finally {
+                if (btn && !silent) { btn.innerHTML = oldHtml; btn.disabled = false; }
+            }
+        }
+
+        async function downloadFromDropbox() {
+            const token = localStorage.getItem('dropbox_token') || DEFAULT_DROPBOX_TOKEN;
+            const btn = document.getElementById('btn-dropbox-download');
+            const oldHtml = btn.innerHTML;
+            if (btn) { btn.innerHTML = "⏳ Lädt..."; btn.disabled = true; }
+
+            try {
+                const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Dropbox-API-Arg': JSON.stringify({
+                            path: '/backup.json'
+                        })
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.settings) localStorage.setItem('appSettings', JSON.stringify(data.settings));
+                    if (data.memory) localStorage.setItem('patientMemory', JSON.stringify(data.memory));
+                    if (data.tours) localStorage.setItem('activeToursData', JSON.stringify(data.tours));
+                    if (data.abholadressen) localStorage.setItem('savedAbholadressen', JSON.stringify(data.abholadressen));
+                    if (data.globalHistory) localStorage.setItem('globalAddressHistory', JSON.stringify(data.globalHistory));
+                    if (data.waypointHistory) localStorage.setItem('waypointAddressHistory', JSON.stringify(data.waypointHistory));
+                    
+                    alert("✅ Daten erfolgreich aus der Cloud geladen!");
+                    location.reload();
+                } else if (response.status === 401) {
+                    handleTokenError();
+                } else {
+                    const errText = await response.text();
+                    alert("Fehler beim Herunterladen: " + errText);
+                }
+            } catch (e) {
+                alert("Netzwerkfehler: " + e.message);
+            } finally {
+                if (btn) { btn.innerHTML = oldHtml; btn.disabled = false; }
+            }
+        }
+
+        function handleTokenError() {
+            const newToken = prompt("Der Dropbox-Schlüssel ist abgelaufen oder ungültig (Fehler 401).\\nBitte generiere einen neuen 'Access Token' in der Dropbox-App-Konsole und füge ihn hier ein:");
+            if (newToken && newToken.trim().length > 10) {
+                localStorage.setItem('dropbox_token', newToken.trim());
+                alert("Neuer Schlüssel gespeichert! Bitte klicke noch einmal auf den Cloud-Button.");
+            } else {
+                alert("Abgebrochen. Cloud-Funktion kann ohne gültigen Schlüssel nicht genutzt werden.");
+            }
         }
         
         let tempMassAbreisen = []; 
