@@ -887,7 +887,21 @@
                         let newAddr = "";
                         if (addrObj.postalCode) newAddr += addrObj.postalCode + " ";
                         newAddr += addrObj.municipality;
-                        newAddr += ", OT " + addrObj.municipalitySubdivision;
+                        
+                        // Korrektur: Unterscheidung zwischen Stadtteil (ST) und Ortsteil (OT) anhand bekannter großer/mittlerer Städte
+                        const stadtteilCities = [
+                            "Magdeburg", "Halle (Saale)", "Halle", "Dessau", "Roßlau", "Leipzig", "Berlin", "Braunschweig", "Hannover", 
+                            "Wolfsburg", "Salzgitter", "Göttingen", "Erfurt", "Dresden", "Chemnitz", "Wolfenbüttel", "Goslar", 
+                            "Halberstadt", "Wernigerode", "Aschersleben", "Bernburg", "Schönebeck", "Stendal", "Bitterfeld", 
+                            "Sangerhausen", "Köthen", "Wittenberg", "Eisleben", "Merseburg", "Naumburg", "Zeitz", "Weißenfels", 
+                            "Nordhausen", "Mühlhausen", "Weimar", "Jena", "Gera", "Zwickau", "Plauen", "Bremen", "Hamburg", "Potsdam"
+                        ];
+                        
+                        const isCity = stadtteilCities.some(city => addrObj.municipality.includes(city));
+                        const subdivisionPrefix = isCity ? "ST " : "OT ";
+                        
+                        newAddr += ", " + subdivisionPrefix + addrObj.municipalitySubdivision;
+                        
                         if (addrObj.streetName) {
                             newAddr += ", " + addrObj.streetName;
                             if (addrObj.streetNumber) newAddr += " " + addrObj.streetNumber;
