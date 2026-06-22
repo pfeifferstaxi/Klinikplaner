@@ -1034,14 +1034,7 @@
             let telefon = parts[7] || "";    
             let abhol = parts[8] || "";      
 
-            const lowerAbhol = abhol.toLowerCase();
-            if (lowerAbhol.includes("diakonie") || lowerAbhol.includes("halle")) {
-                abhol = "Diakoniekrankenhaus Halle, Mühlweg 7, 06114 Halle (Saale)";
-            } else if (lowerAbhol.includes("helios") || lowerAbhol.includes("neindorf") || lowerAbhol.includes("bördeklinik")) {
-                abhol = "Helios Bördeklinik, Kreiskrankenhaus 4, 39387 Oschersleben OT Neindorf";
-            } else if (lowerAbhol.includes("klinikum magdeburg")) {
-                abhol = "Klinikum Magdeburg gGmbH, Birkenallee 34, 39130 Magdeburg";
-            } else if (abhol.length > 3) {
+            if (abhol.length > 3) {
                 abhol = await autoSearchClinic(abhol);
             }
 
@@ -2036,7 +2029,7 @@
             let finalStr = "";
             for(let i=0; i<text.length; i++) {
                 if(text[i] === '"') inQuotes = !inQuotes;
-                if(text[i] === '\n' && inQuotes) {
+                if((text[i] === '\n' || text[i] === '\r') && inQuotes) {
                     finalStr += " "; 
                 } else {
                     finalStr += text[i];
@@ -2044,36 +2037,49 @@
             }
             finalStr = finalStr.replace(/"/g, ''); 
 
-            const cleanRawText = finalStr.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ');
-            const lines = cleanRawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 2);
+            let flatText = finalStr.replace(/\r\n/g, '\t').replace(/[\n\x07\r]/g, '\t');
+            let cells = flatText.split('\t').map(c => c.trim());
             
             let currentDate = globalMassImportDate; 
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                const dateMatch = line.match(/(\d{2})\.(\d{2})\.(\d{2,4})/);
+            
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+                if (!cell) continue;
+                
+                const dateMatch = cell.match(/(\d{2})\.(\d{2})\.(\d{2,4})/);
                 if (dateMatch) {
                     let year = dateMatch[3];
                     if (year.length === 2) year = "20" + year;
                     currentDate = `${year}-${dateMatch[2]}-${dateMatch[1]}`;
                     globalMassImportDate = currentDate; 
-                    continue;
                 }
-
-                if (line.includes(',') && !line.includes('Seite') && !line.includes('Taxianmeldung') && currentDate !== "") {
-                    let name = line.trim();
-                    let addressLine = lines[i + 1] || "";
+                
+                if (cell.match(/\b\d{5}\b/) && cell.length > 10 && !cell.includes('Seite') && !cell.includes('Taxianmeldung')) {
+                    let cleanAddress = cell;
+                    let kasse = "";
+                    let name = "";
+                    let features = [];
                     
-                    if (addressLine.match(/\d{5}/)) {
-                        let cleanAddress = addressLine.replace(/\s[A-Z]{2,4}$/, '').trim();
-                        let features = [];
-                        
-                        if (name.includes("TS") || addressLine.includes("TS") || name.toUpperCase().includes("TRANSPORTSCHEIN")) {
+                    let backIndex = i - 1;
+                    while(backIndex >= 0 && cells[backIndex] === "") backIndex--;
+                    if (backIndex >= 0) {
+                        kasse = cells[backIndex];
+                        backIndex--;
+                    }
+                    while(backIndex >= 0 && cells[backIndex] === "") backIndex--;
+                    if (backIndex >= 0) {
+                        name = cells[backIndex];
+                    }
+                    
+                    if (name && name !== "Name" && name !== "Adresse" && name !== "Kostenträger") {
+                        if (name.includes("TS") || kasse.includes("TS") || cleanAddress.includes("TS") || 
+                            name.toUpperCase().includes("TRANSPORTSCHEIN") || kasse.toUpperCase().includes("TRANSPORTSCHEIN")) {
                             features.push("TRANSPORTSCHEIN", "TS");
                         }
 
                         name = name.replace(/,\s*TS\b|\bTS\s*,|\bTS\b/gi, '').trim();
                         cleanAddress = cleanAddress.replace(/,\s*TS\b|\bTS\s*,|\bTS\b/gi, '').trim();
+                        cleanAddress = cleanAddress.replace(/\s[A-Z]{2,4}$/, '').trim(); 
 
                         cleanAddress = await enhanceAddressWithOrtsteil(cleanAddress);
                         await new Promise(resolve => setTimeout(resolve, 250)); 
@@ -2090,7 +2096,6 @@
                             features: features,
                             isLoaded: false
                         });
-                        i++; 
                     }
                 }
             }
@@ -2156,11 +2161,14 @@
                     const homeAddr = `${row[4] || ""} ${row[5] || ""}, ${row[6] || ""}`.trim(); 
                     
                     let abholAddr = "";
+                    let isKlinik = false;
                     if (vermerk === "TKH") {
                         const klinikName = String(row[8] || "").trim(); 
                         abholAddr = await autoSearchClinic(klinikName);
+                        isKlinik = true;
                     } else if (vermerk === "Zug") {
                         abholAddr = "Bahnhofstr. 4a, 38889 Blankenburg";
+                        isKlinik = true;
                     } else if (vermerk === "T") {
                         abholAddr = homeAddr;
                     }
@@ -2176,7 +2184,7 @@
 
                     if (name && homeAddr) {
                         const enhancedHomeAddr = await enhanceAddressWithOrtsteil(homeAddr);
-                        const enhancedAbholAddr = await enhanceAddressWithOrtsteil(abholAddr);
+                        const enhancedAbholAddr = isKlinik ? abholAddr : await enhanceAddressWithOrtsteil(abholAddr);
 
                         const formattedDate = row[0] ? formatExcelDate(row[0]) : getTodayISO();
 
@@ -2251,17 +2259,36 @@
         async function autoSearchClinic(query) {
             if (!query || query.length < 3) return query;
             let searchQuery = query.replace(/\(TKH\)/gi, '').trim(); 
+            
+            const lowerQuery = searchQuery.toLowerCase();
+            if (lowerQuery.includes("diakonie") || lowerQuery.includes("halle")) {
+                return "Diakoniekrankenhaus Halle, Mühlweg 7, 06114 Halle (Saale)";
+            } else if (lowerQuery.includes("helios") || lowerQuery.includes("neindorf") || lowerQuery.includes("bördeklinik")) {
+                return "Helios Bördeklinik, Kreiskrankenhaus 4, 39387 Oschersleben OT Neindorf";
+            } else if (lowerQuery.includes("klinikum magdeburg")) {
+                return "Klinikum Magdeburg gGmbH, Birkenallee 34, 39130 Magdeburg";
+            } else if (lowerQuery.includes("quedlinburg")) {
+                return "Harzklinikum Dorothea Christiane Erxleben, Ditfurter Weg 24, 06484 Quedlinburg";
+            } else if (lowerQuery.includes("wernigerode")) {
+                return "Harzklinikum Dorothea Christiane Erxleben, Ilsenburger Str. 15, 38855 Wernigerode";
+            }
+
+            let fetchQuery = searchQuery;
+            if (!lowerQuery.includes("klinik") && !lowerQuery.includes("krankenhaus") && !lowerQuery.includes("reha") && !lowerQuery.includes("kur") && !lowerQuery.includes("sanatorium") && !lowerQuery.includes("hospital")) {
+                fetchQuery += " Klinik Krankenhaus";
+            }
+
             try {
-                const url = `https://api.tomtom.com/search/2/geocode/${encodeURIComponent(searchQuery)}.json?key=${TOMTOM_API_KEY}&limit=1&countrySet=DE`;
+                const url = `https://api.tomtom.com/search/2/search/${encodeURIComponent(fetchQuery)}.json?key=${TOMTOM_API_KEY}&limit=1&countrySet=DE`;
                 const resp = await fetch(url);
                 const data = await resp.json();
                 if (data.results && data.results[0]) {
                     const r = data.results[0];
-                    let finalAddr = r.address.freeformAddress;
+                    let finalAddr = r.address.freeformAddress || "";
                     if (r.poi && r.poi.name) {
-                        finalAddr = r.poi.name + ", " + finalAddr;
+                        finalAddr = r.poi.name + (finalAddr ? ", " + finalAddr : "");
                     } else {
-                        finalAddr = query + ", " + finalAddr;
+                        finalAddr = query + (finalAddr ? ", " + finalAddr : "");
                     }
                     return finalAddr;
                 }
