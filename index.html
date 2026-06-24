@@ -2261,16 +2261,20 @@
             let searchQuery = query.replace(/\(TKH\)/gi, '').trim(); 
             
             const lowerQuery = searchQuery.toLowerCase();
-            if (lowerQuery.includes("diakonie") || lowerQuery.includes("halle")) {
-                return "Diakoniekrankenhaus Halle, Mühlweg 7, 06114 Halle (Saale)";
-            } else if (lowerQuery.includes("helios") || lowerQuery.includes("neindorf") || lowerQuery.includes("bördeklinik")) {
+            const isMajorGroup = lowerQuery.includes("ameos") || lowerQuery.includes("helios") || lowerQuery.includes("asklepios") || lowerQuery.includes("sana") || lowerQuery.includes("median");
+
+            if (lowerQuery.includes("neindorf") || lowerQuery.includes("bördeklinik")) {
                 return "Helios Bördeklinik, Kreiskrankenhaus 4, 39387 Oschersleben OT Neindorf";
-            } else if (lowerQuery.includes("klinikum magdeburg")) {
-                return "Klinikum Magdeburg gGmbH, Birkenallee 34, 39130 Magdeburg";
-            } else if (lowerQuery.includes("quedlinburg")) {
-                return "Harzklinikum Dorothea Christiane Erxleben, Ditfurter Weg 24, 06484 Quedlinburg";
-            } else if (lowerQuery.includes("wernigerode")) {
-                return "Harzklinikum Dorothea Christiane Erxleben, Ilsenburger Str. 15, 38855 Wernigerode";
+            } else if (!isMajorGroup) {
+                if (lowerQuery.includes("diakonie") || lowerQuery.includes("halle")) {
+                    return "Diakoniekrankenhaus Halle, Mühlweg 7, 06114 Halle (Saale)";
+                } else if (lowerQuery.includes("klinikum magdeburg")) {
+                    return "Klinikum Magdeburg gGmbH, Birkenallee 34, 39130 Magdeburg";
+                } else if (lowerQuery.includes("quedlinburg")) {
+                    return "Harzklinikum Dorothea Christiane Erxleben, Ditfurter Weg 24, 06484 Quedlinburg";
+                } else if (lowerQuery.includes("wernigerode")) {
+                    return "Harzklinikum Dorothea Christiane Erxleben, Ilsenburger Str. 15, 38855 Wernigerode";
+                }
             }
 
             let fetchQuery = searchQuery;
@@ -2284,11 +2288,33 @@
                 const data = await resp.json();
                 if (data.results && data.results[0]) {
                     const r = data.results[0];
-                    let finalAddr = r.address.freeformAddress || "";
+                    const addr = r.address || {};
+                    
+                    let streetPart = addr.streetName || "";
+                    if (streetPart && addr.streetNumber) {
+                        streetPart += " " + addr.streetNumber;
+                    }
+                    
+                    let cityPart = "";
+                    if (addr.postalCode) cityPart += addr.postalCode + " ";
+                    if (addr.municipality) cityPart += addr.municipality;
+                    cityPart = cityPart.trim();
+
+                    let finalAddr = "";
+                    if (streetPart && cityPart) {
+                        finalAddr = streetPart + ", " + cityPart;
+                    } else if (streetPart) {
+                        finalAddr = streetPart;
+                    } else if (cityPart) {
+                        finalAddr = cityPart;
+                    } else {
+                        finalAddr = addr.freeformAddress || "";
+                    }
+
                     if (r.poi && r.poi.name) {
                         finalAddr = r.poi.name + (finalAddr ? ", " + finalAddr : "");
                     } else {
-                        finalAddr = query + (finalAddr ? ", " + finalAddr : "");
+                        finalAddr = searchQuery + (finalAddr ? ", " + finalAddr : "");
                     }
                     return finalAddr;
                 }
