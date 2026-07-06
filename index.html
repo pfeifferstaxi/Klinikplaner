@@ -1950,8 +1950,10 @@
 
             let abreisen = [];
             let anreisen = [];
+            let dateSet = new Set();
 
             instanceData.forEach(inst => {
+                if (inst.tourDate) dateSet.add(fmtDt(inst.tourDate));
                 const tourName = document.querySelector(`#tab-btn-${inst.id} span`)?.innerText || appSettings.defaultTabName;
                 inst.tourStops.forEach(x => {
                     if (x.type === 'abreise') {
@@ -1962,8 +1964,14 @@
                 });
             });
 
+            let dateStr = Array.from(dateSet).join(' / ');
+            if (!dateStr) {
+                const d = new Date();
+                dateStr = String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
+            }
+
             let html = '<div class="page-break mb-10 text-black">';
-            html += '<div class="bg-[#000000] text-white p-4 mb-6"><h2 class="text-2xl font-black italic uppercase">Tagesübersicht: Abreisen & Anreisen</h2></div>';
+            html += `<div class="bg-[#000000] text-white p-4 mb-6"><h2 class="text-2xl font-black italic uppercase">Tagesliste ${dateStr}: Abreisen & Anreisen</h2></div>`;
 
             if (abreisen.length > 0) {
                 html += '<h3 class="text-lg font-bold uppercase mb-2 mt-4 bg-gray-200 p-2">🏠 Abreisen</h3>';
