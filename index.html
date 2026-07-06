@@ -305,6 +305,7 @@
                         <button onclick="document.getElementById('importFile').value=''; document.getElementById('importFile').click()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-[10px] font-bold py-1 px-2 rounded uppercase border border-gray-300 shadow">Import</button>
                         
                         <button onclick="printCombinedDoc()" class="bg-gray-800 hover:bg-black text-white text-[10px] font-bold py-1 px-3 rounded uppercase ml-1 shadow">🖨 PDF Fahrpläne</button>
+                        <button onclick="printPatientList()" class="bg-green-700 hover:bg-green-900 text-white text-[10px] font-bold py-1 px-3 rounded uppercase ml-1 shadow">🖨 An-/Abreisen</button>
                         <input type="file" id="importFile" class="hidden" accept=".json, application/json, text/plain, */*" onchange="importData(event)">
                     </div>
                 </div>
@@ -395,6 +396,10 @@
                         <div>
                             <label class="block text-[10px] font-bold text-blue-700 uppercase mb-1">Pufferzeit zwischen Stopps (Minuten)</label>
                             <input type="number" id="set-buffer" min="0" step="5" class="w-full p-2 border rounded text-sm outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-blue-700 uppercase mb-1" title="100% = TomTom Standard, 90% = 10% schneller, 110% = 10% langsamer">Fahrzeit-Korrektur (%)</label>
+                            <input type="number" id="set-route-factor" min="50" max="200" class="w-full p-2 border rounded text-sm outline-none focus:border-blue-500" placeholder="z.B. 100">
                         </div>
                     </div>
                 </div>
@@ -801,6 +806,7 @@
         if (!appSettings.title) appSettings.title = "Teufelsbad Planer";
         if (!appSettings.defaultStartAddr) appSettings.defaultStartAddr = "Michaelstein 18, 38889 Blankenburg";
         if (appSettings.bufferMinutes === undefined) appSettings.bufferMinutes = 10;
+        if (appSettings.routeFactor === undefined) appSettings.routeFactor = 100;
         if (appSettings.preisBesetzt === undefined) appSettings.preisBesetzt = 1.50;
         if (appSettings.preisLeer === undefined) appSettings.preisLeer = 0.50;
 
@@ -818,6 +824,7 @@
             document.getElementById('set-title').value = appSettings.title;
             document.getElementById('set-start-addr').value = appSettings.defaultStartAddr;
             document.getElementById('set-buffer').value = appSettings.bufferMinutes;
+            document.getElementById('set-route-factor').value = appSettings.routeFactor !== undefined ? appSettings.routeFactor : 100;
             document.getElementById('set-tab-name').value = appSettings.defaultTabName;
             
             document.getElementById('set-lbl-klinik').value = appSettings.typeLabels.klinik;
@@ -835,6 +842,7 @@
             appSettings.title = document.getElementById('set-title').value;
             appSettings.defaultStartAddr = document.getElementById('set-start-addr').value;
             appSettings.bufferMinutes = parseInt(document.getElementById('set-buffer').value) || 0;
+            appSettings.routeFactor = parseInt(document.getElementById('set-route-factor').value) || 100;
             appSettings.defaultTabName = document.getElementById('set-tab-name').value;
             
             appSettings.typeLabels.klinik = document.getElementById('set-lbl-klinik').value;
@@ -863,6 +871,7 @@
 
         function fmtDt(isoStr) { if (!isoStr) return "--.--.----"; const [y, m, d] = isoStr.split('-'); return `${d}.${m}.${y}`; }
         function getTodayISO() { return new Date().toISOString().split('T')[0]; }
+        function getTodayDDMMYYYY() { const d = new Date(); return String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear(); }
         function getTomorrowISO() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; }
         function roundTo5(minutes) { return Math.ceil(minutes / 5) * 5; }
         function minToTime(totalMinutes) { const h = Math.floor(totalMinutes / 60) % 24; const m = totalMinutes % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; }
@@ -1853,11 +1862,14 @@
                     const modes = ['fastest', 'eco', 'shortest']; const results = {};
                     for (const m of modes) {
                         const locs = tourStops.filter(s => s.lat && s.lon).map(s => `${s.lat},${s.lon}`).join(':');
-                        const url = `https://api.tomtom.com/routing/1/calculateRoute/${locs}/json?key=${TOMTOM_API_KEY}&routeType=${m}&traffic=true`;
+                        let url = `https://api.tomtom.com/routing/1/calculateRoute/${locs}/json?key=${TOMTOM_API_KEY}&routeType=${m}&traffic=true`;
                         try {
                             const res = await fetch(url); const data = await res.json(); if (!data.routes) continue;
                             const route = data.routes[0]; let tempPure = 0; let tempCurrentTime = timeToMin(timeSelect.value);
                             route.legs.forEach((leg, i) => {
+                                if (appSettings.routeFactor && appSettings.routeFactor !== 100) {
+                                    leg.summary.travelTimeInSeconds = leg.summary.travelTimeInSeconds * (appSettings.routeFactor / 100);
+                                }
                                 const roundedLegTime = roundTo5(Math.ceil(leg.summary.travelTimeInSeconds / 60));
                                 tempPure += roundedLegTime; tempCurrentTime += roundedLegTime;
                                 if (i < route.legs.length - 1 && tourStops[i+1].type !== 'wegpunkt') tempCurrentTime += appSettings.bufferMinutes;
@@ -1932,6 +1944,60 @@
             window.print();
         }
 
+        function printPatientList() {
+            const container = document.getElementById('print-container');
+            container.innerHTML = '';
+
+            let abreisen = [];
+            let anreisen = [];
+
+            instanceData.forEach(inst => {
+                const tourName = document.querySelector(`#tab-btn-${inst.id} span`)?.innerText || appSettings.defaultTabName;
+                inst.tourStops.forEach(x => {
+                    if (x.type === 'abreise') {
+                        abreisen.push({ ...x, tourName: tourName });
+                    } else if (x.type === 'anreise') {
+                        anreisen.push({ ...x, tourName: tourName });
+                    }
+                });
+            });
+
+            let html = '<div class="page-break mb-10 text-black">';
+            html += '<div class="bg-[#000000] text-white p-4 mb-6"><h2 class="text-2xl font-black italic uppercase">Tagesübersicht: Abreisen & Anreisen</h2></div>';
+
+            if (abreisen.length > 0) {
+                html += '<h3 class="text-lg font-bold uppercase mb-2 mt-4 bg-gray-200 p-2">🏠 Abreisen</h3>';
+                html += '<table class="w-full text-left border-collapse mb-8">';
+                html += '<thead><tr class="border-b-2 border-black text-[10px] uppercase font-bold"><th>Auto</th><th>Name</th><th>Adresse</th><th class="text-right">Zeit</th></tr></thead><tbody>';
+                abreisen.forEach(a => {
+                    let nameHtml = a.name;
+                    if (nameHtml.includes('[') && nameHtml.includes(']')) nameHtml = nameHtml.replace(/\[(.*?)\]/g, '<span class="font-bold text-red-600">[$1]</span>');
+                    html += `<tr class="border-b border-black"><td class="py-2 text-[11px] font-bold uppercase italic">${a.tourName}</td><td class="py-2 text-sm font-bold">${nameHtml}</td><td class="py-2 text-sm">${a.address}</td><td class="py-2 text-right font-black text-lg">${a.arrStr}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+
+            if (anreisen.length > 0) {
+                html += '<h3 class="text-lg font-bold uppercase mb-2 mt-4 bg-gray-200 p-2">🚚 Anreisen</h3>';
+                html += '<table class="w-full text-left border-collapse mb-8">';
+                html += '<thead><tr class="border-b-2 border-black text-[10px] uppercase font-bold"><th>Auto</th><th>Name</th><th>Adresse</th><th class="text-right">Zeit</th></tr></thead><tbody>';
+                anreisen.forEach(a => {
+                    let nameHtml = a.name;
+                    if (nameHtml.includes('[') && nameHtml.includes(']')) nameHtml = nameHtml.replace(/\[(.*?)\]/g, '<span class="font-bold text-red-600">[$1]</span>');
+                    html += `<tr class="border-b border-black"><td class="py-2 text-[11px] font-bold uppercase italic">${a.tourName}</td><td class="py-2 text-sm font-bold">${nameHtml}</td><td class="py-2 text-sm">${a.address}</td><td class="py-2 text-right font-black text-lg">${a.arrStr}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+
+            if (abreisen.length === 0 && anreisen.length === 0) {
+                html += '<p class="font-bold mt-4">Keine An- oder Abreisen im aktuellen Planer gefunden.</p>';
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+            window.print();
+        }
+
         async function exportData() {
             const data = {
                 settings: JSON.parse(localStorage.getItem('appSettings') || '{}'),
@@ -1941,7 +2007,7 @@
                 globalHistory: JSON.parse(localStorage.getItem('globalAddressHistory') || '[]'),
                 waypointHistory: JSON.parse(localStorage.getItem('waypointAddressHistory') || '[]')
             };
-            const fileName = `${getTodayISO()}_Planer_Backup.json`;
+            const fileName = `${getTodayDDMMYYYY()}_Planer_Backup.json`;
             const jsonStr = JSON.stringify(data, null, 2);
             
             try {
