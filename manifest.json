@@ -1,7 +1,7 @@
 {
   "name": "Klinik-Tourenplaner",
-  "short_name": "Planer",
-  "description": "Tourenplanung und KI-Disposition für die Klinik.",
+  "short_name": "Klinikplaner",
+  "description": "Tourenplanung und KI-Disposition fï¿½r die Klinik.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f3f4f6",

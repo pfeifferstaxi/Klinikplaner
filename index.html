@@ -892,30 +892,48 @@
                 const data = await res.json();
                 if (data.results && data.results[0] && data.results[0].address) {
                     const addrObj = data.results[0].address;
-                    if (addrObj.municipalitySubdivision && addrObj.municipality && addrObj.municipalitySubdivision !== addrObj.municipality) {
+
+                    // NEU: Berücksichtige localName als Fallback, da TomTom ländliche Ortsteile oft dort ablegt, wenn municipalitySubdivision leer ist.
+                    let subDiv = addrObj.municipalitySubdivision;
+                    if (!subDiv && addrObj.localName && addrObj.localName !== addrObj.municipality) {
+                        subDiv = addrObj.localName;
+                    }
+
+                    if (subDiv && addrObj.municipality && subDiv !== addrObj.municipality) {
                         let newAddr = "";
                         if (addrObj.postalCode) newAddr += addrObj.postalCode + " ";
                         newAddr += addrObj.municipality;
                         
-                        // Korrektur: Unterscheidung zwischen Stadtteil (ST) und Ortsteil (OT) anhand bekannter großer/mittlerer Städte
+                        // Korrektur: Striktes Matching (===) statt .includes(), um zu verhindern, dass Teilwörter (z.B. "Halle" in "Hallenberg") als ST markiert werden.
                         const stadtteilCities = [
-                            "Magdeburg", "Halle (Saale)", "Halle", "Dessau", "Roßlau", "Leipzig", "Berlin", "Braunschweig", "Hannover", 
+                            "Magdeburg", "Halle (Saale)", "Halle", "Dessau", "Roßlau", "Dessau-Roßlau", "Leipzig", "Berlin", "Braunschweig", "Hannover", 
                             "Wolfsburg", "Salzgitter", "Göttingen", "Erfurt", "Dresden", "Chemnitz", "Wolfenbüttel", "Goslar", 
-                            "Halberstadt", "Wernigerode", "Aschersleben", "Bernburg", "Schönebeck", "Stendal", "Bitterfeld", 
-                            "Sangerhausen", "Köthen", "Wittenberg", "Eisleben", "Merseburg", "Naumburg", "Zeitz", "Weißenfels", 
+                            "Halberstadt", "Wernigerode", "Aschersleben", "Bernburg", "Bernburg (Saale)", "Schönebeck", "Schönebeck (Elbe)", "Stendal", "Bitterfeld", "Bitterfeld-Wolfen",
+                            "Sangerhausen", "Köthen", "Köthen (Anhalt)", "Wittenberg", "Lutherstadt Wittenberg", "Eisleben", "Lutherstadt Eisleben", "Merseburg", "Naumburg", "Naumburg (Saale)", "Zeitz", "Weißenfels", 
                             "Nordhausen", "Mühlhausen", "Weimar", "Jena", "Gera", "Zwickau", "Plauen", "Bremen", "Hamburg", "Potsdam"
                         ];
                         
-                        const isCity = stadtteilCities.some(city => addrObj.municipality.includes(city));
+                        const isCity = stadtteilCities.some(city => addrObj.municipality === city || addrObj.municipality.startsWith(city + " ") || addrObj.municipality.startsWith(city + "-"));
                         const subdivisionPrefix = isCity ? "ST " : "OT ";
                         
-                        newAddr += ", " + subdivisionPrefix + addrObj.municipalitySubdivision;
+                        newAddr += ", " + subdivisionPrefix + subDiv;
                         
                         if (addrObj.streetName) {
                             newAddr += ", " + addrObj.streetName;
                             if (addrObj.streetNumber) newAddr += " " + addrObj.streetNumber;
                         }
                         return newAddr.trim();
+                    } else if (addrObj.municipality) {
+                       // Fallback, wenn kein expliziter Subdivision gefunden wurde, aber die Adresse neu aufgebaut werden kann
+                       let newAddr = "";
+                       if (addrObj.postalCode) newAddr += addrObj.postalCode + " ";
+                       newAddr += addrObj.municipality;
+                       if (addrObj.streetName) {
+                            newAddr += ", " + addrObj.streetName;
+                            if (addrObj.streetNumber) newAddr += " " + addrObj.streetNumber;
+                        }
+                        // Nur ersetzen, wenn wir wirklich ein besseres Format haben (mit PLZ)
+                        if (addrObj.postalCode) return newAddr.trim();
                     }
                 }
             } catch (e) {
